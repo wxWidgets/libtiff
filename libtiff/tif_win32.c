@@ -294,6 +294,14 @@ TIFF *TIFFOpenExt(const char *name, const char *mode, TIFFOpenOptions *opts)
         CloseHandle(fd);
     return tif;
 }
+/* Edited by Proshanto Brahmmachary
+ * Fix for building with Cygwin on Windows.
+ * Uncomment the comment on line 304 about function TIFFOpenWExt.
+ * It adds a forward declaration for TIFFOpenWExt(const wchar_t *name, const char *mode, TIFFOpenOptions *opts),
+ * preventing the compiler from assuming an implicit int() declaration and throwing a type conflict warning:
+ * tif_win32.c:303:12: warning: implicit declaration of function ‘TIFFOpenWExt’; did you mean ‘TIFFOpenExt’? [-Wimplicit-function-declaration]
+ */
+// TIFF *TIFFOpenWExt(const wchar_t *name, const char *mode, TIFFOpenOptions *opts);
 
 /*
  * Open a TIFF file with a Unicode filename, for read/writing.
