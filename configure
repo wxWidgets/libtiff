@@ -876,6 +876,7 @@ enable_pixarlog
 enable_jpeg
 with_jpeg_include_dir
 with_jpeg_lib_dir
+with_jpeg_from_wx
 enable_old_jpeg
 enable_jbig
 with_jbig_include_dir
@@ -1660,6 +1661,7 @@ Optional Packages:
   --with-jpeg-include-dir=DIR
                           location of IJG JPEG library headers
   --with-jpeg-lib-dir=DIR location of IJG JPEG library binary
+  --with-jpeg-from-wx     use JPEG library bundled with wxWidgets
   --with-jbig-include-dir=DIR
                           location of JBIG-KIT headers
   --with-jbig-lib-dir=DIR location of JBIG-KIT library binary
@@ -19660,7 +19662,18 @@ if test "${with_jpeg_lib_dir+set}" = set; then :
 fi
 
 
+
+# Check whether --with-jpeg-from-wx was given.
+if test "${with_jpeg_from_wx+set}" = set; then :
+  withval=$with_jpeg_from_wx;
+fi
+
+
 if test "x$enable_jpeg" != "xno" ; then
+  if test "x$with_jpeg_from_wx" = "xyes" ; then
+	CPPFLAGS="-I${srcdir}/../jpeg -I`pwd`/../../lib $CPPFLAGS"
+	HAVE_JPEG=yes
+  else
 
   if test "x$with_jpeg_lib_dir" != "x" ; then
     LDFLAGS="-L$with_jpeg_lib_dir $LDFLAGS"
@@ -19774,6 +19787,7 @@ fi
     HAVE_JPEG=yes
   fi
 
+  fi
 fi
 
 if test "$HAVE_JPEG" = "yes" ; then

@@ -561,7 +561,15 @@ AC_ARG_WITH(jpeg-lib-dir,
 	    AS_HELP_STRING([--with-jpeg-lib-dir=DIR],
 			   [location of IJG JPEG library binary]),,)
 
+AC_ARG_WITH(jpeg-from-wx,
+		AS_HELP_STRING([--with-jpeg-from-wx],
+			   [use JPEG library bundled with wxWidgets]),,)
+
 if test "x$enable_jpeg" != "xno" ; then
+  if test "x$with_jpeg_from_wx" = "xyes" ; then
+	CPPFLAGS="-I${srcdir}/../jpeg -I`pwd`/../../lib $CPPFLAGS"
+	HAVE_JPEG=yes
+  else
 
   if test "x$with_jpeg_lib_dir" != "x" ; then
     LDFLAGS="-L$with_jpeg_lib_dir $LDFLAGS"
@@ -588,6 +596,7 @@ if test "x$enable_jpeg" != "xno" ; then
     HAVE_JPEG=yes
   fi
 
+  fi
 fi
 
 if test "$HAVE_JPEG" = "yes" ; then
