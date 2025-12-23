@@ -813,6 +813,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -960,6 +961,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1212,6 +1214,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1349,7 +1360,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1502,6 +1513,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1983,7 +1995,7 @@ else
 #define $2 innocuous_$2
 
 /* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $2 (void); below.
+    which can conflict with char $2 (); below.
     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
     <limits.h> exists even on freestanding compilers.  */
 
@@ -2001,7 +2013,7 @@ else
 #ifdef __cplusplus
 extern "C"
 #endif
-char $2 (void);
+char $2 ();
 /* The GNU C library defines this for functions which it implements
     to always fail with ENOSYS.  Some functions are actually named
     something starting with __ and the normal name is an alias.  */
@@ -2010,7 +2022,7 @@ choke me
 #endif
 
 int
-main (void)
+main ()
 {
 return $2 ();
   ;
@@ -2261,7 +2273,7 @@ else
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 if (sizeof ($2))
 	 return 0;
@@ -2274,7 +2286,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 if (sizeof (($2)))
 	    return 0;
@@ -2316,7 +2328,7 @@ else
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 #ifndef $as_decl_name
 #ifdef __cplusplus
@@ -2358,7 +2370,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 static int test_array [1 - 2 * !(($2) >= 0)];
 test_array [0] = 0;
@@ -2375,7 +2387,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 static int test_array [1 - 2 * !(($2) <= $ac_mid)];
 test_array [0] = 0;
@@ -2402,7 +2414,7 @@ else
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 static int test_array [1 - 2 * !(($2) < 0)];
 test_array [0] = 0;
@@ -2419,7 +2431,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 static int test_array [1 - 2 * !(($2) >= $ac_mid)];
 test_array [0] = 0;
@@ -2454,7 +2466,7 @@ while test "x$ac_lo" != "x$ac_hi"; do
 /* end confdefs.h.  */
 $4
 int
-main (void)
+main ()
 {
 static int test_array [1 - 2 * !(($2) <= $ac_mid)];
 test_array [0] = 0;
@@ -2479,12 +2491,12 @@ esac
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 $4
-static long int longval (void) { return $2; }
-static unsigned long int ulongval (void) { return $2; }
+static long int longval () { return $2; }
+static unsigned long int ulongval () { return $2; }
 #include <stdio.h>
 #include <stdlib.h>
 int
-main (void)
+main ()
 {
 
   FILE *f = fopen ("conftest.val", "w");
@@ -4081,7 +4093,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -4221,7 +4233,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdio.h>
 int
-main (void)
+main ()
 {
 FILE *f = fopen ("conftest.out", "w");
  return ferror (f) || fclose (f) != 0;
@@ -4285,7 +4297,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -4336,7 +4348,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 #ifndef __GNUC__
        choke me
@@ -4377,7 +4389,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -4392,7 +4404,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -4408,7 +4420,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -4457,7 +4469,9 @@ struct stat;
 /* Most of the following tests are stolen from RCS 5.7's src/conf.sh.  */
 struct buf { int x; };
 FILE * (*rcsopen) (struct buf *, struct stat *, int);
-static char *e (char **p, int i)
+static char *e (p, i)
+     char **p;
+     int i;
 {
   return p[i];
 }
@@ -4492,7 +4506,7 @@ int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, i
 int argc;
 char **argv;
 int
-main (void)
+main ()
 {
 return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
   ;
@@ -4550,7 +4564,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -4976,7 +4990,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -6772,7 +6786,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -7620,7 +7634,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -8344,7 +8358,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -8379,7 +8393,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -8668,7 +8682,7 @@ else
 #include <float.h>
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -8738,7 +8752,7 @@ else
 
 #define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
 int
-main (void)
+main ()
 {
   int i;
   for (i = 0; i < 256; i++)
@@ -10886,7 +10900,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -10939,7 +10953,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -12439,7 +12453,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -13410,9 +13424,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char dlopen (void);
+char dlopen ();
 int
-main (void)
+main ()
 {
 return dlopen ();
   ;
@@ -13471,9 +13485,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char shl_load (void);
+char shl_load ();
 int
-main (void)
+main ()
 {
 return shl_load ();
   ;
@@ -13514,9 +13528,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char dlopen (void);
+char dlopen ();
 int
-main (void)
+main ()
 {
 return dlopen ();
   ;
@@ -13553,9 +13567,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char dlopen (void);
+char dlopen ();
 int
-main (void)
+main ()
 {
 return dlopen ();
   ;
@@ -13592,9 +13606,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char dld_link (void);
+char dld_link ();
 int
-main (void)
+main ()
 {
 return dld_link ();
   ;
@@ -14167,7 +14181,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 #ifndef __GNUC__
        choke me
@@ -14208,7 +14222,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -14223,7 +14237,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -14239,7 +14253,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -14977,7 +14991,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -15031,7 +15045,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -17397,7 +17411,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -18354,9 +18368,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char sin (void);
+char sin ();
 int
-main (void)
+main ()
 {
 return sin ();
   ;
@@ -18410,7 +18424,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
 #ifndef __cplusplus
@@ -18530,7 +18544,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	     #include <sys/param.h>
 
 int
-main (void)
+main ()
 {
 #if ! (defined BYTE_ORDER && defined BIG_ENDIAN \
 		     && defined LITTLE_ENDIAN && BYTE_ORDER && BIG_ENDIAN \
@@ -18550,7 +18564,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 		#include <sys/param.h>
 
 int
-main (void)
+main ()
 {
 #if BYTE_ORDER != BIG_ENDIAN
 		 not big endian
@@ -18576,7 +18590,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 #include <limits.h>
 
 int
-main (void)
+main ()
 {
 #if ! (defined _LITTLE_ENDIAN || defined _BIG_ENDIAN)
 	      bogus endian macros
@@ -18593,7 +18607,7 @@ if ac_fn_c_try_compile "$LINENO"; then :
 #include <limits.h>
 
 int
-main (void)
+main ()
 {
 #ifndef _BIG_ENDIAN
 		 not big endian
@@ -18635,7 +18649,7 @@ short int ascii_mm[] =
 		extern int foo;
 
 int
-main (void)
+main ()
 {
 return use_ascii (foo) == use_ebcdic (foo);
   ;
@@ -18661,7 +18675,7 @@ else
 /* end confdefs.h.  */
 $ac_includes_default
 int
-main (void)
+main ()
 {
 
 	     /* Are we little or big endian?  From Harbison&Steele.  */
@@ -18740,7 +18754,7 @@ else
 #include <time.h>
 
 int
-main (void)
+main ()
 {
 struct tm tm;
 				     int *p = &tm.tm_sec;
@@ -18776,7 +18790,7 @@ else
 #include <sys/types.h> /* for off_t */
      #include <stdio.h>
 int
-main (void)
+main ()
 {
 int (*fp) (FILE *, off_t, int) = fseeko;
      return fseeko (stdin, 0, 0) && fp (stdin, 0, 0);
@@ -18795,7 +18809,7 @@ rm -f core conftest.err conftest.$ac_objext \
 #include <sys/types.h> /* for off_t */
      #include <stdio.h>
 int
-main (void)
+main ()
 {
 int (*fp) (FILE *, off_t, int) = fseeko;
      return fseeko (stdin, 0, 0) && fp (stdin, 0, 0);
@@ -19030,7 +19044,7 @@ else
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
 int
-main (void)
+main ()
 {
 
   ;
@@ -19076,7 +19090,7 @@ else
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
 int
-main (void)
+main ()
 {
 
   ;
@@ -19100,7 +19114,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
 int
-main (void)
+main ()
 {
 
   ;
@@ -19145,7 +19159,7 @@ else
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
 int
-main (void)
+main ()
 {
 
   ;
@@ -19169,7 +19183,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
 int
-main (void)
+main ()
 {
 
   ;
@@ -19428,9 +19442,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char inflateEnd (void);
+char inflateEnd ();
 int
-main (void)
+main ()
 {
 return inflateEnd ();
   ;
@@ -19536,9 +19550,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char libdeflate_zlib_decompress (void);
+char libdeflate_zlib_decompress ();
 int
-main (void)
+main ()
 {
 return libdeflate_zlib_decompress ();
   ;
@@ -19669,9 +19683,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char jpeg_read_scanlines (void);
+char jpeg_read_scanlines ();
 int
-main (void)
+main ()
 {
 return jpeg_read_scanlines ();
   ;
@@ -19731,9 +19745,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char jpeg12_read_scanlines (void);
+char jpeg12_read_scanlines ();
 int
-main (void)
+main ()
 {
 return jpeg12_read_scanlines ();
   ;
@@ -19859,9 +19873,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char jbg_dec_init (void);
+char jbg_dec_init ();
 int
-main (void)
+main ()
 {
 return jbg_dec_init ();
   ;
@@ -19990,9 +20004,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char lerc_decode (void);
+char lerc_decode ();
 int
-main (void)
+main ()
 {
 return lerc_decode ();
   ;
@@ -20036,9 +20050,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char lerc_decode (void);
+char lerc_decode ();
 int
-main (void)
+main ()
 {
 return lerc_decode ();
   ;
@@ -20160,9 +20174,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char lzma_code (void);
+char lzma_code ();
 int
-main (void)
+main ()
 {
 return lzma_code ();
   ;
@@ -20277,9 +20291,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char ZSTD_decompressStream (void);
+char ZSTD_decompressStream ();
 int
-main (void)
+main ()
 {
 return ZSTD_decompressStream ();
   ;
@@ -20394,9 +20408,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char WebPDecode (void);
+char WebPDecode ();
 int
-main (void)
+main ()
 {
 return WebPDecode ();
   ;
@@ -20680,7 +20694,7 @@ if test "$ac_x_libraries" = no; then
 /* end confdefs.h.  */
 #include <X11/Xlib.h>
 int
-main (void)
+main ()
 {
 XrmInitialize ()
   ;
@@ -20766,7 +20780,7 @@ $as_echo_n "checking whether -R must be followed by a space... " >&6; }
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -20783,7 +20797,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 
   ;
@@ -20827,9 +20841,9 @@ rm -f core conftest.err conftest.$ac_objext \
 #ifdef __cplusplus
 extern "C"
 #endif
-char XOpenDisplay (void);
+char XOpenDisplay ();
 int
-main (void)
+main ()
 {
 return XOpenDisplay ();
   ;
@@ -20855,9 +20869,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char dnet_ntoa (void);
+char dnet_ntoa ();
 int
-main (void)
+main ()
 {
 return dnet_ntoa ();
   ;
@@ -20896,9 +20910,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char dnet_ntoa (void);
+char dnet_ntoa ();
 int
-main (void)
+main ()
 {
 return dnet_ntoa ();
   ;
@@ -20956,9 +20970,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char gethostbyname (void);
+char gethostbyname ();
 int
-main (void)
+main ()
 {
 return gethostbyname ();
   ;
@@ -20997,9 +21011,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char gethostbyname (void);
+char gethostbyname ();
 int
-main (void)
+main ()
 {
 return gethostbyname ();
   ;
@@ -21053,9 +21067,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char connect (void);
+char connect ();
 int
-main (void)
+main ()
 {
 return connect ();
   ;
@@ -21102,9 +21116,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char remove (void);
+char remove ();
 int
-main (void)
+main ()
 {
 return remove ();
   ;
@@ -21151,9 +21165,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char shmat (void);
+char shmat ();
 int
-main (void)
+main ()
 {
 return shmat ();
   ;
@@ -21203,9 +21217,9 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char IceConnectionNumber (void);
+char IceConnectionNumber ();
 int
-main (void)
+main ()
 {
 return IceConnectionNumber ();
   ;
@@ -21260,9 +21274,9 @@ $as_echo_n "checking for pthread_join in LIBS=$PTHREAD_LIBS with CFLAGS=$PTHREAD
 #ifdef __cplusplus
 extern "C"
 #endif
-char pthread_join (void);
+char pthread_join ();
 int
-main (void)
+main ()
 {
 return pthread_join ();
   ;
@@ -21379,7 +21393,7 @@ $as_echo_n "checking for the pthreads library -l$flag... " >&6; }
 	             static void routine(void* a) {a=0;}
 	             static void* start_routine(void* a) {return a;}
 int
-main (void)
+main ()
 {
 pthread_t th; pthread_attr_t attr;
                      pthread_create(&th,0,start_routine,0);
@@ -21425,7 +21439,7 @@ $as_echo_n "checking for joinable pthread attribute... " >&6; }
 /* end confdefs.h.  */
 #include <pthread.h>
 int
-main (void)
+main ()
 {
 int attr=$attr; return attr;
   ;
@@ -21552,7 +21566,7 @@ else
 /* end confdefs.h.  */
 
 int
-main (void)
+main ()
 {
 #ifndef _MSC_VER
        choke me
@@ -21654,7 +21668,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   error no gl.h
 # endif
 int
-main (void)
+main ()
 {
 glBegin(0)
   ;
@@ -21679,7 +21693,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   error no gl.h
 # endif
 int
-main (void)
+main ()
 {
 glBegin(0)
   ;
@@ -21704,7 +21718,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   error no gl.h
 # endif
 int
-main (void)
+main ()
 {
 glBegin(0)
   ;
@@ -21740,7 +21754,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   error no gl.h
 # endif
 int
-main (void)
+main ()
 {
 glBegin(0)
   ;
@@ -21836,7 +21850,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   error no glu.h
 # endif
 int
-main (void)
+main ()
 {
 gluBeginCurve(0)
   ;
@@ -21869,7 +21883,7 @@ fi
 #   error no glu.h
 # endif
 int
-main (void)
+main ()
 {
 gluBeginCurve(0)
   ;
@@ -21936,7 +21950,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   include <OpenGL/glu.h>
 # endif
 int
-main (void)
+main ()
 {
 GLvoid (*func)(...); gluTessCallback(0, 0, func)
   ;
@@ -22024,7 +22038,7 @@ fi
 #   error no glut.h
 # endif
 int
-main (void)
+main ()
 {
 glutMainLoop()
   ;
@@ -22054,7 +22068,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #   error no glut.h
 # endif
 int
-main (void)
+main ()
 {
 glutMainLoop()
   ;
