@@ -31,7 +31,7 @@
 
 PROGRAM=libtool
 PACKAGE=libtool
-VERSION=2.5.4
+VERSION="2.5.4 Debian-2.5.4-9"
 package_revision=2.5.4
 
 
@@ -64,7 +64,7 @@ package_revision=2.5.4
 # libraries, which are installed to $pkgauxdir.
 
 # Set a version string for this script.
-scriptversion=2019-02-19.15; # UTC
+scriptversion=2024-12-01.17; # UTC
 
 # General shell script boiler plate, and helper functions.
 # Written by Gary V. Vaughan, 2004
@@ -430,7 +430,7 @@ EXIT_SKIP=77	  # $? = 77 is used to indicate a skipped test to automake.
 # putting '$debug_cmd' at the start of all your functions, you can get
 # bash to show function call trace with:
 #
-#    debug_cmd='eval echo "${FUNCNAME[0]} $*" >&2' bash your-script-name
+#    debug_cmd='echo "${FUNCNAME[0]} $*" >&2' bash your-script-name
 debug_cmd=${debug_cmd-":"}
 exit_cmd=:
 
@@ -572,27 +572,16 @@ func_require_term_colors ()
 # ---------------------
 # Append VALUE onto the existing contents of VAR.
 
-  # We should try to minimise forks, especially on Windows where they are
-  # unreasonably slow, so skip the feature probes when bash or zsh are
-  # being used:
-  if test set = "${BASH_VERSION+set}${ZSH_VERSION+set}"; then
-    : ${_G_HAVE_ARITH_OP="yes"}
-    : ${_G_HAVE_XSI_OPS="yes"}
-    # The += operator was introduced in bash 3.1
-    case $BASH_VERSION in
-      [12].* | 3.0 | 3.0*) ;;
-      *)
-        : ${_G_HAVE_PLUSEQ_OP="yes"}
-        ;;
-    esac
-  fi
 
   # _G_HAVE_PLUSEQ_OP
   # Can be empty, in which case the shell is probed, "yes" if += is
   # usable or anything else if it does not work.
-  test -z "$_G_HAVE_PLUSEQ_OP" \
-    && (eval 'x=a; x+=" b"; test "a b" = "$x"') 2>/dev/null \
-    && _G_HAVE_PLUSEQ_OP=yes
+if test -z "$_G_HAVE_PLUSEQ_OP" &&  \
+     __PLUSEQ_TEST="a" &&  \
+     __PLUSEQ_TEST+=" b" 2>/dev/null &&  \
+     test "a b" = "$__PLUSEQ_TEST"; then
+   _G_HAVE_PLUSEQ_OP=yes
+fi
 
 if test yes = "$_G_HAVE_PLUSEQ_OP"
 then
@@ -1706,6 +1695,8 @@ func_run_hooks ()
 {
     $debug_cmd
 
+    _G_rc_run_hooks=false
+
     case " $hookable_fns " in
       *" $1 "*) ;;
       *) func_fatal_error "'$1' does not support hook functions." ;;
@@ -2227,7 +2218,7 @@ func_version ()
 	year=`date +%Y`
 
 	cat <<EOF
-$progname $scriptversion
+$progname $scriptversion Debian-2.5.4-9
 Copyright (C) $year Free Software Foundation, Inc.
 License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
@@ -2321,12 +2312,12 @@ include the following information:
        compiler:       $LTCC
        compiler flags: $LTCFLAGS
        linker:         $LD (gnu? $with_gnu_ld)
-       version:        $progname $scriptversion
+       version:        $progname $scriptversion Debian-2.5.4-9
        automake:       `($AUTOMAKE --version) 2>/dev/null |$SED 1q`
        autoconf:       `($AUTOCONF --version) 2>/dev/null |$SED 1q`
 
 Report bugs to <bug-libtool@gnu.org>.
-GNU libtool home page: <https://www.gnu.org/software/libtool/>.
+GNU libtool home page: <https://www.gnu.org/s/libtool/>.
 General help using GNU software: <https://www.gnu.org/gethelp/>."
     exit 0
 }
@@ -2525,6 +2516,8 @@ libtool_options_prep ()
 
     nonopt=
     preserve_args=
+
+    _G_rc_lt_options_prep=:
 
     _G_rc_lt_options_prep=:
 
@@ -5335,7 +5328,7 @@ func_win32_libid ()
   *ar\ archive*) # could be an import, or static
     # Keep the egrep pattern in sync with the one in _LT_CHECK_MAGIC_METHOD.
     if eval $OBJDUMP -f $1 | $SED -e '10q' 2>/dev/null |
-       $EGREP 'file format (pei*-i386(.*architecture: i386)?|pe-arm-wince|pe-x86-64|pe-aarch64|coff-arm|coff-arm64|coff-i386|coff-x86-64)' >/dev/null; then
+       $EGREP 'file format (pei*-i386(.*architecture: i386)?|pe-arm-wince|pe-x86-64|pe-aarch64)' >/dev/null; then
       case $nm_interface in
       "MS dumpbin")
 	if func_cygming_ms_implib_p "$1" ||
@@ -5943,7 +5936,6 @@ EOF
 # include <unistd.h>
 # include <stdint.h>
 # ifdef __CYGWIN__
-#  include <process.h>
 #  include <io.h>
 # endif
 #endif
@@ -5960,7 +5952,7 @@ EOF
 
 /* declarations of non-ANSI functions */
 #if defined __MINGW32__
-# if defined(__STRICT_ANSI__) && !defined(__MINGW64_VERSION_MAJOR) || defined(_POSIX_)
+# ifdef __STRICT_ANSI__
 _CRTIMP int __cdecl _putenv (const char *);
 # endif
 #elif defined __CYGWIN__
@@ -6862,41 +6854,6 @@ EOF
 }
 # end: func_emit_cwrapperexe_src
 
-# func_emit_exe_manifest
-# emit a Win32 UAC manifest for executable on stdout
-# Must ONLY be called from within func_mode_link because
-# it depends on a number of variable set therein.
-func_emit_exe_manifest ()
-{
-    cat <<EOF
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity version="1.0.0.0"
-EOF
-
-    case $host in
-    i?86-*-* )   echo '     processorArchitecture="x86"' ;;
-    ia64-*-* )   echo '     processorArchitecture="ia64"' ;;
-    x86_64-*-* ) echo '     processorArchitecture="amd64"' ;;
-    *)           echo '     processorArchitecture="*"' ;;
-    esac
-
-    cat <<EOF
-     name="$host_os.$PROGRAM.$outputname"
-     type="win32"/>
-
-  <!-- Identify the application security requirements. -->
-  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
-    <security>
-      <requestedPrivileges>
-        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
-      </requestedPrivileges>
-    </security>
-  </trustInfo>
-</assembly>
-EOF
-}
-
 # func_win32_import_lib_p ARG
 # True if ARG is an import lib, as indicated by $file_magic_cmd
 func_win32_import_lib_p ()
@@ -7751,7 +7708,6 @@ func_mode_link ()
       # -static-libsan       Link with static sanitizer runtimes (Clang)
       # -no-canonical-prefixes Do not expand any symbolic links
       # -fuse-ld=*           Linker select flags for GCC
-      # -shared-*            direct GCC to link specific libraries dynamically
       # -static-*            direct GCC to link specific libraries statically
       # -fcilkplus           Cilk Plus language extension features for C/C++
       # -rtlib=*             select c runtime lib with clang
@@ -7766,7 +7722,6 @@ func_mode_link ()
       -specs=*|-fsanitize=*|-fno-sanitize*|-shared-libsan|-static-libsan| \
       -ffile-prefix-map=*|-fdebug-prefix-map=*|-fmacro-prefix-map=*|-fprofile-prefix-map=*| \
       -fdiagnostics-color*|-frecord-gcc-switches| \
-      -ffast-math|-fgnu-tm|-ftree-parallelize-loops=*|-funsafe-math-optimizations|-fvtable-verify*|-shared-*| \
       -fuse-ld=*|-static-*|-fcilkplus|-Wa,*|-Werror|-Werror=*)
         func_quote_arg pretty "$arg"
 	arg=$func_quote_arg_result
@@ -8072,7 +8027,10 @@ func_mode_link ()
 	case $pass in
 	dlopen) libs=$dlfiles ;;
 	dlpreopen) libs=$dlprefiles ;;
-	link) libs="$deplibs %DEPLIBS% $dependency_libs" ;;
+	link)
+	  libs="$deplibs %DEPLIBS%"
+	  test "X$link_all_deplibs" != Xno && libs="$libs $dependency_libs"
+	  ;;
 	esac
       fi
       if test lib,dlpreopen = "$linkmode,$pass"; then
@@ -8266,15 +8224,8 @@ func_mode_link ()
 	  fi
 	  case $linkmode in
 	  lib)
-	    # Linking convenience modules and compiler provided static libraries
-	    # into shared libraries is allowed, but linking other static
-	    # libraries is non-portable.
-	    case $deplib in
-	      */libgcc*.$libext | */libclang_rt*.$libext)
-		deplibs="$deplib $deplibs"
-		continue
-	      ;;
-	    esac
+	    # Linking convenience modules into shared libraries is allowed,
+	    # but linking other static libraries is non-portable.
 	    case " $dlpreconveniencelibs " in
 	    *" $deplib "*) ;;
 	    *)
@@ -8395,19 +8346,19 @@ func_mode_link ()
 	    # It is a libtool convenience library, so add in its objects.
 	    func_append convenience " $ladir/$objdir/$old_library"
 	    func_append old_convenience " $ladir/$objdir/$old_library"
+	    tmp_libs=
+	    for deplib in $dependency_libs; do
+	      deplibs="$deplib $deplibs"
+	      if $opt_preserve_dup_deps; then
+		case "$tmp_libs " in
+		*" $deplib "*) func_append specialdeplibs " $deplib" ;;
+		esac
+	      fi
+	      func_append tmp_libs " $deplib"
+	    done
 	  elif test prog != "$linkmode" && test lib != "$linkmode"; then
 	    func_fatal_error "'$lib' is not a convenience library"
 	  fi
-	  tmp_libs=
-	  for deplib in $dependency_libs; do
-	    deplibs="$deplib $deplibs"
-	    if $opt_preserve_dup_deps; then
-	      case "$tmp_libs " in
-	      *" $deplib "*) func_append specialdeplibs " $deplib" ;;
-	      esac
-	    fi
-	    func_append tmp_libs " $deplib"
-	  done
 	  continue
 	fi # $pass = conv
 
@@ -9038,9 +8989,7 @@ func_mode_link ()
 		  eval libdir=`$SED -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
 		  test -z "$libdir" && \
 		    func_fatal_error "'$deplib' is not a valid libtool archive"
-		  abs_inode=`ls -i "$deplib" | awk '{print $1}'`
-		    lib_inode=`ls -i "$libdir/$(basename $deplib)" | awk '{print $1}'`
-		  test "$abs_inode" != "$lib_inode" && \
+		  test "$absdir" != "$libdir" && \
 		    func_warning "'$deplib' seems to be moved"
 
 		  path=-L$absdir
@@ -9345,6 +9294,9 @@ func_mode_link ()
 	    age=$number_minor
 	    revision=$number_minor
 	    lt_irix_increment=no
+	    ;;
+	  *)
+	    func_fatal_configuration "$modename: unknown library version type '$version_type'"
 	    ;;
 	  *)
 	    func_fatal_configuration "$modename: unknown library version type '$version_type'"
@@ -9748,15 +9700,6 @@ func_mode_link ()
 			a_deplib=
 			break 2
 		      fi
-		      # Linking compiler provided static libraries into shared
-		      # libraries is allowed, but linking other static libraries is
-		      # non-portable.
-		      case $potlib in
-		        */libFortran*.$libext | */libflang_rt*.$libext)
-		          func_append newdeplibs " $potlib"
-		          a_deplib=
-		          ;;
-		      esac
 		  done
 		done
 	      fi
@@ -10965,7 +10908,7 @@ func_mode_link ()
 	    cwrappersource=$output_path/$objdir/lt-$output_name.c
 	    cwrapper=$output_path/$output_name.exe
 	    $RM $cwrappersource $cwrapper
-	    trap "$RM $cwrappersource $cwrapper $cwrapper.manifest; exit $EXIT_FAILURE" 1 2 15
+	    trap "$RM $cwrappersource $cwrapper; exit $EXIT_FAILURE" 1 2 15
 
 	    func_emit_cwrapperexe_src > $cwrappersource
 
@@ -10985,16 +10928,6 @@ func_mode_link ()
 	    $opt_dry_run || {
 	      # note: this script will not be executed, so do not chmod.
 	      if test "x$build" = "x$host"; then
-		# Create the UAC manifests first if necessary (but the
-		# manifest files must have executable permission regardless).
-		case $output_name in
-		  *instal*|*patch*|*setup*|*update*)
-		    func_emit_exe_manifest > $cwrapper.manifest
-		    func_emit_exe_manifest > $output_path/$objdir/$output_name.exe.manifest
-		    chmod +x $cwrapper.manifest
-		    chmod +x $output_path/$objdir/$output_name.exe.manifest
-		  ;;
-		esac
 		$cwrapper --lt-dump-script > $func_ltwrapper_scriptname_result
 	      else
 		func_emit_wrapper no > $func_ltwrapper_scriptname_result
@@ -11521,9 +11454,8 @@ func_mode_uninstall ()
 	    # note $name still contains .exe if it was in $file originally
 	    # as does the version of $file that was added into $rmfiles
 	    func_append rmfiles " $odir/$name $odir/${name}S.$objext"
-	    func_append rmfiles " ${name}.manifest $objdir/${name}.manifest"
 	    if test yes = "$fast_install" && test -n "$relink_command"; then
-	      func_append rmfiles " $odir/lt-$name $objdir/lt-${name}.manifest"
+	      func_append rmfiles " $odir/lt-$name"
 	    fi
 	    if test "X$noexename" != "X$name"; then
 	      func_append rmfiles " $odir/lt-$noexename.c"
