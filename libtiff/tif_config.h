@@ -124,10 +124,10 @@
 /* #undef PACKAGE_URL */
 
 /* The size of `size_t', as computed by sizeof. */
-#if defined(_WIN32) && !defined(_WIN64)
-#define SIZEOF_SIZE_T 4
-#else
+#if SIZE_MAX > 0xFFFFFFFFu
 #define SIZEOF_SIZE_T 8
+#else
+#define SIZEOF_SIZE_T 4
 #endif
 
 /* Default size of the strip in bytes (when strip chopping enabled) */
